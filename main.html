@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Investment Decision Flowchart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .node {
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 280px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+
+        .start {
+            background: linear-gradient(135deg, #87CEEB, #5DADE2);
+            color: white;
+            font-size: 18px;
+        }
+
+        .question {
+            background: linear-gradient(135deg, #F7DC6F, #F4D03F);
+            color: #2c3e50;
+            font-size: 16px;
+            border: 3px solid #F1C40F;
+        }
+
+        .question.active {
+            animation: pulse 2s infinite;
+            border-color: #E74C3C;
+        }
+
+        .decision-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            min-width: 80px;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #58D68D, #2ECC71);
+            color: white;
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #EC7063, #E74C3C);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .result {
+            background: linear-gradient(135deg, #A569BD, #8E44AD);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .result.invest {
+            background: linear-gradient(135deg, #58D68D, #27AE60);
+        }
+
+        .result.pass {
+            background: linear-gradient(135deg, #85929E, #5D6D7E);
+        }
+
+        .result.wait {
+            background: linear-gradient(135deg, #F39C12, #E67E22);
+        }
+
+        .result.monitor {
+            background: linear-gradient(135deg, #5DADE2, #3498DB);
+        }
+
+        .arrow {
+            font-size: 24px;
+            color: #7F8C8D;
+            animation: bounce 2s infinite;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .visible {
+            display: block;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #E74C3C, #C0392B);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ECF0F1;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498DB, #2ECC71);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stock-input {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stock-input input {
+            padding: 12px 20px;
+            border: 2px solid #BDC3C7;
+            border-radius: 8px;
+            font-size: 16px;
+            width: 250px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .stock-input input:focus {
+            outline: none;
+            border-color: #3498DB;
+        }
+
+        .stock-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Stock Investment Decision Flowchart</h1>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="stock-input">
+            <input type="text" id="stockInput" placeholder="Enter stock symbol (e.g., AAPL)" maxlength="10">
+        </div>
+
+        <div class="flowchart">
+            <div class="node start" id="start">
+                <div class="stock-name" id="stockName">Evaluate Stock</div>
+                Start Your Analysis
+            </div>
+
+            <div class="arrow" id="arrow1">↓</div>
+
+            <div class="node question active" id="q1">
+                <div>Do you understand the business?</div>
+                <div class="decision-buttons">
+                    <button class="btn btn-yes" onclick="answer('q1', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q1', 'no')">No</button>
+                </div>
+            </div>
+
+            <div class="arrow hidden" id="arrow2">↓</div>
+
+            <div class="node question hidden" id="q2">
+                <div>Does it have an economic moat?</div>
+                <div class="decision-buttons">
+                    <button class="btn btn-yes" onclick="answer('q2', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q2', 'no')">No</button>
+                </div>
+            </div>
+
+            <div class="arrow hidden" id="arrow3">↓</div>
+
+            <div class="node question hidden" id="q3">
+                <div>Is the management trustworthy?</div>
+                <div class="decision-buttons">
+                    <button class="btn btn-yes" onclick="answer('q3', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q3', 'no')">No</button>
+                </div>
+            </div>
+
+            <div class="arrow hidden" id="arrow4">↓</div>
+
+            <div class="node question hidden" id="q4">
+                <div>Strong financials? (ROE >15%, low debt)</div>
+                <div class="decision-buttons">
+                    <button class="btn btn-yes" onclick="answer('q4', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q4', 'no')">No</button>
+                </div>
+            </div>
+
+            <div class="arrow hidden" id="arrow5">↓</div>
+
+            <div class="node question hidden" id="q5">
+                <div>Price below intrinsic value? (Margin of Safety)</div>
+                <div class="decision-buttons">
+                    <button class="btn btn-yes" onclick="answer('q5', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q5', 'no')">No</button>
+                </div>
+            </div>
+
+            <div class="arrow hidden" id="arrow6">↓</div>
+
+            <div class="node question hidden" id="q6">
+                <div>Aligns with long-term goals?</div>
+                <div class="decision-buttons">
+                    <button class="btn btn-yes" onclick="answer('q6', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q6', 'no')">No</button>
+                </div>
+            </div>
+
+            <div class="arrow hidden" id="arrow7">↓</div>
+
+            <div class="node result invest hidden" id="invest">
+                🎉 INVEST IN STOCK
+                <div style="font-size: 14px; margin-top: 10px; font-weight: 400;">
+                    This stock meets all your criteria!
+                </div>
+            </div>
+
+            <div class="arrow hidden" id="arrow8">↓</div>
+
+            <div class="node result monitor hidden" id="monitor">
+                📈 MONITOR FUNDAMENTALS
+                <div style="font-size: 14px; margin-top: 10px; font-weight: 400;">
+                    Keep tracking the stock's performance
+                </div>
+            </div>
+
+            <div class="node result pass hidden" id="pass">
+                ❌ PASS ON THIS STOCK
+                <div style="font-size: 14px; margin-top: 10px; font-weight: 400;">
+                    This stock doesn't meet your criteria
+                </div>
+            </div>
+
+            <div class="node result wait hidden" id="wait">
+                ⏳ WAIT FOR BETTER PRICE
+                <div style="font-size: 14px; margin-top: 10px; font-weight: 400;">
+                    Stock is good but overpriced
+                </div>
+            </div>
+        </div>
+
+        <button class="reset-btn" onclick="resetFlowchart()">🔄 Start Over</button>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        const totalQuestions = 6;
+
+        function updateProgress() {
+            const progress = ((currentQuestion - 1) / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateStockName() {
+            const stockInput = document.getElementById('stockInput');
+            const stockName = document.getElementById('stockName');
+            
+            if (stockInput.value.trim()) {
+                stockName.textContent = `Evaluate ${stockInput.value.toUpperCase()}`;
+            } else {
+                stockName.textContent = 'Evaluate Stock';
+            }
+        }
+
+        document.getElementById('stockInput').addEventListener('input', updateStockName);
+
+        function answer(questionId, response) {
+            const currentQ = document.getElementById(questionId);
+            currentQ.classList.remove('active');
+            
+            // Hide current question buttons
+            const buttons = currentQ.querySelectorAll('.btn');
+            buttons.forEach(btn => btn.style.display = 'none');
+            
+            // Show result based on response
+            if (response === 'no') {
+                if (questionId === 'q5') {
+                    showResult('wait');
+                } else {
+                    showResult('pass');
+                }
+                return;
+            }
+            
+            // If yes, continue to next question or final result
+            if (questionId === 'q6') {
+                showResult('invest');
+                setTimeout(() => {
+                    showArrow('arrow7');
+                    setTimeout(() => {
+                        showResult('monitor');
+                    }, 500);
+                }, 500);
+            } else {
+                showNextQuestion();
+            }
+        }
+
+        function showNextQuestion() {
+            currentQuestion++;
+            updateProgress();
+            
+            const arrowId = `arrow${currentQuestion}`;
+            const questionId = `q${currentQuestion}`;
+            
+            showArrow(arrowId);
+            
+            setTimeout(() => {
+                showQuestion(questionId);
+            }, 500);
+        }
+
+        function showArrow(arrowId) {
+            const arrow = document.getElementById(arrowId);
+            arrow.classList.remove('hidden');
+            arrow.classList.add('visible');
+        }
+
+        function showQuestion(questionId) {
+            const question = document.getElementById(questionId);
+            question.classList.remove('hidden');
+            question.classList.add('visible', 'active');
+        }
+
+        function showResult(resultType) {
+            const result = document.getElementById(resultType);
+            result.classList.remove('hidden');
+            result.classList.add('visible');
+            
+            // Update progress to 100% for final result
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function resetFlowchart() {
+            currentQuestion = 1;
+            updateProgress();
+            
+            // Hide all elements except the first question
+            const elements = document.querySelectorAll('.arrow, .question, .result');
+            elements.forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('visible', 'active');
+            });
+            
+            // Reset buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => btn.style.display = 'inline-block');
+            
+            // Show first question
+            const firstQuestion = document.getElementById('q1');
+            firstQuestion.classList.remove('hidden');
+            firstQuestion.classList.add('visible', 'active');
+            
+            // Reset stock input
+            document.getElementById('stockInput').value = '';
+            updateStockName();
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>
